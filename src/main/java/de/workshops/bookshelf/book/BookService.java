@@ -1,11 +1,10 @@
 package de.workshops.bookshelf.book;
 
 import jakarta.annotation.PostConstruct;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +46,12 @@ class BookService {
                 .filter(book -> hasAuthor(book, request.author()))
                 .filter(book -> hasIsbn(book, request.isbn()))
                 .toList();
+    }
+
+    Book createBook(Book book) {
+        books.add(book);
+
+        return book;
     }
 
     private boolean hasIsbn(Book book, String isbn) {
