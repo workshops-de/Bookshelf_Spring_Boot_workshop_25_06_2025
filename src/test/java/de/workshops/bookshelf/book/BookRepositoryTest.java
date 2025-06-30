@@ -38,6 +38,6 @@ class BookRepositoryTest {
         assertEquals(4, books.size());
         assertEquals(book.getIsbn(), books.get(3).getIsbn());
 
-        bookRepository.deleteBook(book);
+        bookRepository.delete(book);
     }
 }

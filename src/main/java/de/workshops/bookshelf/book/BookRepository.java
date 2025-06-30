@@ -32,7 +32,7 @@ class BookRepository {
         return book;
     }
 
-    void deleteBook(Book book) {
+    void delete(Book book) {
         String sql = "DELETE FROM book WHERE isbn = ?";
 
         jdbcTemplate.update(
