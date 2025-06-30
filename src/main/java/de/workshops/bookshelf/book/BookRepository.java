@@ -1,36 +1,43 @@
 package de.workshops.bookshelf.book;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.stereotype.Repository;
-
-import java.io.IOException;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
 class BookRepository {
 
-    private final ObjectMapper mapper;
+    private final JdbcTemplate jdbcTemplate;
 
-    private final ResourceLoader resourceLoader;
+    List<Book> findAll() {
+        String sql = "SELECT * FROM book";
 
-    private List<Book> books;
-
-    @PostConstruct
-    void initBookList() throws IOException {
-        this.books = mapper.readValue(
-            resourceLoader
-                .getResource("classpath:books.json")
-                .getInputStream(),
-            new TypeReference<>() {}
-        );
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Book.class));
     }
 
-    List<Book> findAllBooks() {
-        return books;
+    Book create(Book book) {
+        String sql = "INSERT INTO book (title, description, author, isbn) VALUES (?, ?, ?, ?)";
+
+        jdbcTemplate.update(
+            sql,
+            book.getTitle(),
+            book.getDescription(),
+            book.getAuthor(),
+            book.getIsbn()
+        );
+
+        return book;
+    }
+
+    void deleteBook(Book book) {
+        String sql = "DELETE FROM book WHERE isbn = ?";
+
+        jdbcTemplate.update(
+            sql,
+            book.getIsbn()
+        );
     }
 }

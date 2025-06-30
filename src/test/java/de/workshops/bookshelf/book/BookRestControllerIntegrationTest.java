@@ -1,11 +1,13 @@
 package de.workshops.bookshelf.book;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.workshops.bookshelf.config.JacksonTestConfiguration;
 import io.restassured.RestAssured;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -23,6 +26,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
+@Import(JacksonTestConfiguration.class)
 class BookRestControllerIntegrationTest {
 
     @Autowired
@@ -107,6 +111,9 @@ class BookRestControllerIntegrationTest {
         String jsonPayload = mvcResult.getResponse().getContentAsString();
 
         Book book = objectMapper.readValue(jsonPayload, Book.class);
-        assertEquals(expectedBook, book);
+        assertThat(book)
+            .usingRecursiveComparison()
+            .ignoringFields("id")
+            .isEqualTo(expectedBook);
     }
 }
