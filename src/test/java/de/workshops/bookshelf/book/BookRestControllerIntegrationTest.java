@@ -40,7 +40,8 @@ class BookRestControllerIntegrationTest {
 
     @Test
     void getAllBooks() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/book"))
+        MvcResult mvcResult = mockMvc
+            .perform(MockMvcRequestBuilders.get("/book"))
             .andDo(MockMvcResultHandlers.print())
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(3)))
@@ -94,18 +95,19 @@ class BookRestControllerIntegrationTest {
         expectedBook.setIsbn(isbn);
         expectedBook.setDescription(description);
 
-        var mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/book")
-                .content(
-                    """
-                    {
-                        "isbn": "%s",
-                        "title": "%s",
-                        "author": "%s",
-                        "description": "%s"
-                    }
-                    """
-                .formatted(isbn, title, author, description))
-                .contentType(MediaType.APPLICATION_JSON))
+        var mvcResult = mockMvc
+            .perform(MockMvcRequestBuilders.post("/book")
+            .content(
+                """
+                {
+                    "isbn": "%s",
+                    "title": "%s",
+                    "author": "%s",
+                    "description": "%s"
+                }
+                """
+            .formatted(isbn, title, author, description))
+            .contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andReturn();
         String jsonPayload = mvcResult.getResponse().getContentAsString();
@@ -115,5 +117,12 @@ class BookRestControllerIntegrationTest {
             .usingRecursiveComparison()
             .ignoringFields("id")
             .isEqualTo(expectedBook);
+
+        // Restore previous database state.
+        mockMvc
+            .perform(MockMvcRequestBuilders.delete("/book/{isbn}", book.getIsbn())
+            .contentType(MediaType.APPLICATION_JSON))
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }

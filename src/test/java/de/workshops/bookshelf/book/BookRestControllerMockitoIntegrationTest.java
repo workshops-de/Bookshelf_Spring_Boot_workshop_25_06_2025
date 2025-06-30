@@ -40,7 +40,8 @@ class BookRestControllerMockitoIntegrationTest {
 
         Mockito.when(bookService.getAllBooks()).thenReturn(mockedBookList);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/book"))
+        mockMvc
+            .perform(MockMvcRequestBuilders.get("/book"))
             .andDo(MockMvcResultHandlers.print())
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(2)))

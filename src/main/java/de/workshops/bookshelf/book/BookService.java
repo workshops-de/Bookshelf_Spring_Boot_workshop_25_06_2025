@@ -47,6 +47,10 @@ class BookService {
         return bookRepository.create(book);
     }
 
+    void deleteBook(Book book) {
+        bookRepository.delete(book);
+    }
+
     private boolean hasIsbn(Book book, String isbn) {
         return book.getIsbn().equals(isbn);
     }
