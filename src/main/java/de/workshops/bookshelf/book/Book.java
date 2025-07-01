@@ -22,7 +22,7 @@ import org.hibernate.proxy.HibernateProxy;
 @AllArgsConstructor
 @Builder
 @Entity
-public class Book {
+class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

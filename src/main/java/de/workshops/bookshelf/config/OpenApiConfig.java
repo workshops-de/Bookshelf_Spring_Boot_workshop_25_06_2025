@@ -12,7 +12,7 @@ class OpenApiConfig {
 
   @Bean
   @ConditionalOnBooleanProperty("application.custom-open-api-config.enabled")
-  public OpenAPI api() {
+  OpenAPI api() {
     return new OpenAPI()
         .info(
             new Info()

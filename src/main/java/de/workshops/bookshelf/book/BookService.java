@@ -16,46 +16,36 @@ class BookService {
         return bookRepository.findAll();
     }
 
-    Book searchBookByIsbn(String isbn) throws BookNotFoundException {
-        return bookRepository
-            .findAll()
-            .stream()
-            .filter(book -> hasIsbn(book, isbn))
-            .findFirst()
-            .orElseThrow(BookNotFoundException::new);
-    }
-
-    Book searchBookByAuthor(String author) throws BookNotFoundException {
-        return bookRepository
-            .findAll()
-            .stream()
-            .filter(book -> hasAuthor(book, author))
-            .findFirst()
-            .orElseThrow(BookNotFoundException::new);
-    }
-
-    List<Book> searchBooks(BookSearchRequest request) {
-        return bookRepository
-            .findAll()
-            .stream()
-                .filter(book -> hasAuthor(book, request.author()))
-                .filter(book -> hasIsbn(book, request.isbn()))
-                .toList();
-    }
-
     Book createBook(Book book) {
-        return bookRepository.create(book);
+        return bookRepository.save(book);
     }
 
     void deleteBook(Book book) {
         bookRepository.delete(book);
     }
 
-    private boolean hasIsbn(Book book, String isbn) {
-        return book.getIsbn().equals(isbn);
+    Book searchBookByIsbn(String isbn) throws BookNotFoundException {
+        final var book = bookRepository.findByIsbn(isbn);
+        if (book == null) {
+            throw new BookNotFoundException();
+        }
+
+        return book;
     }
 
-    private boolean hasAuthor(Book book, String author) {
-        return book.getAuthor().contains(author);
+    Book searchBookByAuthor(String author) throws BookNotFoundException {
+        final var book = bookRepository.findByAuthorContaining(author);
+        if (book == null) {
+            throw new BookNotFoundException();
+        }
+
+        return book;
+    }
+
+    List<Book> searchBooks(BookSearchRequest request) {
+        return bookRepository.findByIsbnAndAuthorContaining(
+            request.isbn(),
+            request.author()
+        );
     }
 }

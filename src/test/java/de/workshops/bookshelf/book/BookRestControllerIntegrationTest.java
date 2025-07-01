@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -89,30 +90,25 @@ class BookRestControllerIntegrationTest {
         String isbn = "978-0321125217";
         String description = "This is not a book about specific technologies. It offers readers a systematic approach to domain-driven design, presenting an extensive set of design best practices, experience-based techniques, and fundamental principles that facilitate the development of software projects facing complex domains.";
 
-        Book expectedBook = new Book();
-        expectedBook.setAuthor(author);
-        expectedBook.setTitle(title);
-        expectedBook.setIsbn(isbn);
-        expectedBook.setDescription(description);
+        Book expectedBook = generateExpectedBook(
+            author,
+            title,
+            isbn,
+            description
+        );
 
-        var mvcResult = mockMvc
-            .perform(MockMvcRequestBuilders.post("/book")
-            .content(
-                """
-                {
-                    "isbn": "%s",
-                    "title": "%s",
-                    "author": "%s",
-                    "description": "%s"
-                }
-                """
-            .formatted(isbn, title, author, description))
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andReturn();
+        ResultMatcher expectedHttpStatus = MockMvcResultMatchers.status().isOk();
+        var mvcResult = sendCreateBookRequest(
+            isbn,
+            title,
+            author,
+            description,
+            expectedHttpStatus
+        );
         String jsonPayload = mvcResult.getResponse().getContentAsString();
 
         Book book = objectMapper.readValue(jsonPayload, Book.class);
+
         assertThat(book)
             .usingRecursiveComparison()
             .ignoringFields("id")
@@ -124,5 +120,46 @@ class BookRestControllerIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON))
             .andDo(MockMvcResultHandlers.print())
             .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    private MvcResult sendCreateBookRequest(
+        String isbn,
+        String title,
+        String author,
+        String description,
+        ResultMatcher expectedHttpStatus
+    )
+        throws Exception {
+        return mockMvc
+            .perform(MockMvcRequestBuilders.post("/book")
+            .content(
+                """
+                    {
+                        "isbn": "%s",
+                        "title": "%s",
+                        "author": "%s",
+                        "description": "%s"
+                    }
+                    """
+                    .formatted(
+                        isbn,
+                        title,
+                        author,
+                        description
+                    )
+            )
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(expectedHttpStatus)
+            .andReturn();
+    }
+
+    private Book generateExpectedBook(String author, String title, String isbn, String description) {
+        return Book
+            .builder()
+            .author(author)
+            .title(title)
+            .isbn(isbn)
+            .description(description)
+            .build();
     }
 }

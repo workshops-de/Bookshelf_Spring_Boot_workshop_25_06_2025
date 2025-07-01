@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/")
 @RequiredArgsConstructor
-public class BookController {
+class BookController {
 
   private final BookService bookService;
 
   @GetMapping
-  public String getAllBooks(Model model) {
+  String getAllBooks(Model model) {
     model.addAttribute("books", bookService.getAllBooks());
 
     return "books";
