@@ -1,5 +1,6 @@
 package de.workshops.bookshelf.config;
 
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -16,6 +17,8 @@ public class BookshelfApplicationProperties {
   private String version;
 
   private CustomOpenApiConfig customOpenApiConfig;
+
+  private Map<String, BookshelfUser> credentials;
 
   @Setter
   @Getter

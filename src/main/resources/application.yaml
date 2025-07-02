@@ -1,6 +1,13 @@
 application:
   title: '@project.name@'
   version: '@project.version@'
+  credentials:
+    admin:
+      username: dbAdmin
+      password: ${ADMIN_PASSWORD}
+    user:
+      username: dbUser
+      password: ${USER_PASSWORD}
 
 bookshelf:
   some-number: 11
@@ -19,3 +26,10 @@ spring:
       ddl-auto: validate
   liquibase:
     drop-first: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+        exclude: "heapdump,threaddump"
